@@ -25,6 +25,7 @@
 
   <!-- configured_publisher and configured_subscriber-->
   <depend>geometry_msgs</depend>
+  <depend>tf2_msgs</depend>
   <depend>rmw_microxrcedds</depend>
 
   <export>
