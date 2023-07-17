@@ -3,6 +3,8 @@
 #include <rclc/rclc.h>
 #include <rclc/executor.h>
 
+#include <micro_ros_utilities/type_utilities.h>
+
 #include <rosidl_runtime_c/string.h>
 
 #include <std_msgs/msg/header.h>
@@ -41,8 +43,6 @@ tf2_msgs__msg__TFMessage msg;
 // msg.transforms.data is NULL or uninitialised
 // msg.transforms.size is 0 or uninitialised
 // msg.transforms.capacity is 0 or uninitialised
-geometry_msgs__msg__TransformStamped buffer[100];
-
 
 void subscription_callback(const void * msgin)
 {
@@ -56,14 +56,18 @@ void subscription_callback(const void * msgin)
 
   for (size_t i = 0; i < size; ++i) {
     const std_msgs__msg__Header * header = &data[i].header;
+    const rosidl_runtime_c__String * frame_id = &header->frame_id;
+
     const rosidl_runtime_c__String * child_frame_id = &data[i].child_frame_id;
     const geometry_msgs__msg__Transform * transform = &data[i].transform;
     const geometry_msgs__msg__Vector3 * translation = &transform->translation;
     const geometry_msgs__msg__Quaternion * rotation = &transform->rotation;
 
-    printf("Translation[%zu]: x: %f, y: %f, z: %f\n",
+    printf("frame_id[%zu]: %s, child_frame_id[%zu]: %s\n",
+        i, frame_id->data, i, child_frame_id->data);
+    printf("translation[%zu]: x: %f, y: %f, z: %f\n",
         i, translation->x, translation->y, translation->z);
-    printf("Rotation[%zu]:    x: %f, y: %f, z: %f, w: %f\n",
+    printf("rotation[%zu]:    x: %f, y: %f, z: %f, w: %f\n",
         i, rotation->x, rotation->y, rotation->z, rotation->w);
   }
   printf("\n");
@@ -82,10 +86,21 @@ int main()
   RCCHECK(rclc_node_init_default(&node, "tf2_subscriber_rclc", "", &support));
 
   // memory management
-  msg.transforms.data = buffer;
-  msg.transforms.size = 0;
-  msg.transforms.capacity = 100;
+  // static geometry_msgs__msg__TransformStamped buffer[100];
+  // msg.transforms.data = buffer;
+  // msg.transforms.size = 0;
+  // msg.transforms.capacity = 100;
 
+  static micro_ros_utilities_memory_conf_t conf = {0};
+  conf.max_string_capacity = 50;
+  conf.max_ros2_type_sequence_capacity = 100;
+  conf.max_basic_type_sequence_capacity = 100;
+
+  bool success = micro_ros_utilities_create_message_memory(
+    ROSIDL_GET_MSG_TYPE_SUPPORT(tf2_msgs, msg, TFMessage),
+    &msg,
+    conf
+  );
 
   // create subscriber
   RCCHECK(rclc_subscription_init_default(

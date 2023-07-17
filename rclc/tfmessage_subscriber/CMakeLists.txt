@@ -8,6 +8,7 @@ find_package(rclc REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(tf2_msgs REQUIRED)
 find_package(rmw_microxrcedds REQUIRED)
+find_package(micro_ros_utilities REQUIRED)
 
 add_executable(${PROJECT_NAME} main.c)
 
@@ -17,6 +18,7 @@ ament_target_dependencies(${PROJECT_NAME}
   geometry_msgs
   tf2_msgs
   rmw_microxrcedds
+  micro_ros_utilities
 )
 
 install(TARGETS ${PROJECT_NAME}
