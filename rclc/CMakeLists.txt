@@ -69,6 +69,7 @@ export_executable(parameter_server)
 export_executable(multithread_publisher_subscriber)
 
 # additional examples 
+export_executable(tfmessage_subscriber)
 export_executable(transform_subscriber)
 export_executable(vector3_subscriber)
 
