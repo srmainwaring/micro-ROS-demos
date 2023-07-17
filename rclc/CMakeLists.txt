@@ -68,6 +68,9 @@ export_executable(parameter_server)
 # export_executable(configuration_example custom_transports)
 export_executable(multithread_publisher_subscriber)
 
+# additional examples 
+export_executable(vector3_subscriber)
+
 if(EXISTS ${CMAKE_BINARY_DIR}/temp_install/)
     install(
         DIRECTORY
